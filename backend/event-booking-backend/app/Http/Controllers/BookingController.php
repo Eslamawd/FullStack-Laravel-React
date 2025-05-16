@@ -1,32 +1,33 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBookingRequest;
+use App\Http\Resources\BookingResource;
 use App\Models\Booking;
-use App\Models\Event;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+
 class BookingController extends Controller
 {
-    public function store(Request $request)
+    public function store(StoreBookingRequest $request)
     {
-        $request->validate(rules: [
-            'event_id' => 'required|exists:events,id',
-        ]);
-
         $user = $request->user();
 
-        $booking = Booking::firstOrCreate(attributes: [
+        $booking = Booking::firstOrCreate([
             'user_id' => $user->id,
             'event_id' => $request->event_id,
         ]);
 
-        return response()->json(data: ['message' => 'Booking successful', 'booking' => $booking]);
+        return response()->json([
+            'message' => 'Booking successful',
+            'booking' => new BookingResource($booking),
+        ]);
     }
 
- public function index(Request $request)
-{
-    $bokings = Booking::where( 'user_id',  $request->user()->id)->with( 'event')->get();
-    return response()->json( $bokings);
-}
+    public function index()
+    {
+        $user = auth()->user();
+
+        $bookings = Booking::where('user_id', $user->id)->with('event')->get();
+
+        return BookingResource::collection($bookings);
+    }
 }
