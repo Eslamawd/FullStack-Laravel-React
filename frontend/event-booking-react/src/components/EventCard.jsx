@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 
-export default function EventCard({ event, addBooking, myBooking }) {
+export default function EventCard({ event, addBooking, myBookings }) {
   const { user } = useAuth(); // 👈 جلب حالة المستخدم
     const navigate = useNavigate();
 
@@ -19,7 +19,8 @@ export default function EventCard({ event, addBooking, myBooking }) {
   };
 
 
-  const isBooked = myBooking.some((booking) => booking.event_id === event.id);
+  const isBooked = myBookings.some(booking => booking.event_id === event.id);
+  
   return (
     <div className="bg-white shadow-md rounded p-4 space-y-2">
       {event.image_path && (

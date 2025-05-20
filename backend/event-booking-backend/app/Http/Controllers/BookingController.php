@@ -28,6 +28,7 @@ class BookingController extends Controller
 
         $bookings = Booking::where('user_id', $user->id)->with('event')->get();
 
-        return BookingResource::collection($bookings);
+        return response()->json(BookingResource::collection($bookings)->resolve());
+
     }
 }

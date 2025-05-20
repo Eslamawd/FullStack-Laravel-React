@@ -10,14 +10,20 @@ export default function Home() {
   const [myBookings, setMyBookings] = useState([]);
 
   useEffect(() => {
-    axiosClient.get('/api/my-bookings')
-      .then(res => setMyBookings(res.data))
-      .catch(err => console.error('خطأ في جلب الحجوزات:', err));
+    if(user) {
+
+      axiosClient.get('/api/my-bookings')
+        .then(res => setMyBookings(res.data))
+        .catch(err => console.error('خطأ في جلب الحجوزات:', err));
+    }
       
  axiosClient.get('/api/events')
       .then(res => setEvents(res.data))
       .catch(err => console.error(err));
-  }, []);
+  }, [user]);
+  
+
+  
 
   const handleEventClick = async(eventId) => {
     // Handle event click, e.g., navigate to event details
@@ -27,7 +33,7 @@ export default function Home() {
         const saveBooking = await axiosClient.post(`/api/bookings`,
           {'event_id': eventId,} // Assuming you need to send the event ID in the request body
         )
-        myBookings.push(saveBooking.data);
+       setMyBookings(prev => [...prev, saveBooking.data.booking]);
         console.log('Booking response:', saveBooking.data);
         
       } catch (error) {
@@ -46,7 +52,7 @@ export default function Home() {
       <h1 className="text-3xl font-bold mb-6">الفعاليات المتاحة</h1>
       <div className="grid md:grid-cols-3 gap-6">
         {events?.map(event => (
-          <EventCard key={event.id} event={event} addBooking={handleEventClick} myBooking={myBookings} />
+          <EventCard key={event.id} event={event} addBooking={handleEventClick} myBookings={myBookings} />
         ))}
       </div>
     </div>
